@@ -8,4 +8,5 @@ class DetectionResult:
     category: Optional[str] = None
     rule: Optional[str] = None
     severity: str = "low"
+    action: str = "ALLOW"
     reason: Optional[str] = None
