@@ -21,6 +21,7 @@ def log_detection(
         "method": request.method,
         "path": request.path,
         "detected": result.detected,
+        "action": result.action,
         "category": result.category,
         "severity": result.severity,
         "rule": result.rule,
