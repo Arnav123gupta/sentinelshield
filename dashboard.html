@@ -1,0 +1,189 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SentinelShield Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 24px;
+            background: #f4f6f8;
+        }
+
+        h1 {
+            margin-bottom: 24px;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .number {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        section {
+            margin-top: 24px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background: #f0f2f4;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🛡️ SentinelShield Security Dashboard</h1>
+
+    <div class="cards">
+        <div class="card">
+            <div>Total Requests</div>
+            <div class="number">5</div>
+        </div>
+
+        <div class="card">
+            <div>Blocked Requests</div>
+            <div class="number">1</div>
+        </div>
+
+        <div class="card">
+            <div>Allowed Requests</div>
+            <div class="number">1</div>
+        </div>
+
+        <div class="card">
+            <div>Security Alerts</div>
+            <div class="number">1</div>
+        </div>
+    </div>
+
+    <section>
+        <h2>Attack Categories</h2>
+        <table>
+            <tr>
+                <th>Category</th>
+                <th>Count</th>
+            </tr>
+            <tr><td>SQL_INJECTION</td><td>4</td></tr>
+        </table>
+    </section>
+
+    <section>
+        <h2>Severity Breakdown</h2>
+        <table>
+            <tr>
+                <th>Severity</th>
+                <th>Count</th>
+            </tr>
+            <tr><td>HIGH</td><td>4</td></tr>
+        </table>
+    </section>
+
+    <section>
+        <h2>Recent Security Events</h2>
+        <table>
+            <tr>
+                <th>Timestamp</th>
+                <th>IP</th>
+                <th>Path</th>
+                <th>Category</th>
+                <th>Severity</th>
+                <th>Action</th>
+            </tr>
+            
+        <tr>
+            <td>2026-09-21T07:43:09.828498+00:00</td>
+            <td>127.0.0.1</td>
+            <td>/search</td>
+            <td>SQL_INJECTION</td>
+            <td>high</td>
+            <td>UNKNOWN</td>
+        </tr>
+        
+        <tr>
+            <td>2026-09-21T07:53:43.627628+00:00</td>
+            <td>127.0.0.1</td>
+            <td>/search</td>
+            <td>SQL_INJECTION</td>
+            <td>high</td>
+            <td>UNKNOWN</td>
+        </tr>
+        
+        <tr>
+            <td>2026-09-21T08:04:05.036342+00:00</td>
+            <td>127.0.0.1</td>
+            <td>/search</td>
+            <td>SQL_INJECTION</td>
+            <td>high</td>
+            <td>UNKNOWN</td>
+        </tr>
+        
+        <tr>
+            <td>2026-09-24T08:16:25.899598+00:00</td>
+            <td>127.0.0.1</td>
+            <td>/home</td>
+            <td>NORMAL</td>
+            <td>low</td>
+            <td>ALLOW</td>
+        </tr>
+        
+        <tr>
+            <td>2026-09-24T08:16:25.909460+00:00</td>
+            <td>127.0.0.1</td>
+            <td>/login</td>
+            <td>SQL_INJECTION</td>
+            <td>high</td>
+            <td>BLOCK</td>
+        </tr>
+        
+        </table>
+    </section>
+
+    <section>
+        <h2>Recent Alerts</h2>
+        <table>
+            <tr>
+                <th>Timestamp</th>
+                <th>Category</th>
+                <th>Severity</th>
+                <th>Action</th>
+            </tr>
+            
+        <tr>
+            <td>2026-09-24T10:54:37.479303+00:00</td>
+            <td>XSS</td>
+            <td>high</td>
+            <td>BLOCK</td>
+        </tr>
+        
+        </table>
+    </section>
+</body>
+</html>
