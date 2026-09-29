@@ -1,5 +1,6 @@
 from app.models.request import HTTPRequest
 from app.core.protection_manager import ProtectionManager
+from app.detectors.rule_detector import inspect_request
 
 
 class RequestProtection:
@@ -7,6 +8,11 @@ class RequestProtection:
         self.manager = manager or ProtectionManager()
 
     def check(self, request: HTTPRequest) -> str:
+        detection_result = inspect_request(request)
+
+        if detection_result.action == "BLOCK":
+            return "BLOCK"
+
         request_key = f"{request.method}:{request.path}"
 
         return self.manager.check_request(
