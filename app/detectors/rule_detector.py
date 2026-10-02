@@ -31,7 +31,7 @@ RULES = {
 }
 
 
-def inspect_request(request: HTTPRequest) -> DetectionResult:
+def build_detection_target(request: HTTPRequest) -> str:
     header_values = [
         f"{key}: {value}"
         for key, value in request.headers.items()
@@ -44,7 +44,11 @@ def inspect_request(request: HTTPRequest) -> DetectionResult:
         request.body or "",
     ]
 
-    target = " ".join(parts)
+    return " ".join(parts)
+
+
+def inspect_request(request: HTTPRequest) -> DetectionResult:
+    target = build_detection_target(request)
 
     for category, rules in RULES.items():
         for pattern, severity in rules:
