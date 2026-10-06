@@ -183,3 +183,40 @@ def test_safe_search_query_is_allowed():
 
     assert result.action == "ALLOW"
     assert result.detected is False
+
+
+def test_multiple_findings_are_collected():
+    request = HTTPRequest(
+        method="GET",
+        path="/search",
+        query_params={
+            "id": "1 OR 1=1 UNION SELECT username FROM users",
+            "q": "<script>alert(1)</script>",
+            "file": "/etc/passwd",
+        },
+    )
+
+    result = inspect_request(request)
+
+    categories = {finding.category for finding in result.findings}
+
+    assert result.action == "BLOCK"
+    assert result.detected is True
+    assert "SQL_INJECTION" in categories
+    assert "XSS" in categories
+    assert "LFI" in categories
+    assert len(result.findings) >= 3
+    assert result.severity == "critical"
+
+
+def test_safe_request_has_no_findings():
+    request = HTTPRequest(
+        method="GET",
+        path="/search",
+        query_params={"q": "learn web security"},
+    )
+
+    result = inspect_request(request)
+
+    assert result.action == "ALLOW"
+    assert result.findings == []

@@ -1,7 +1,7 @@
 import re
 
 from app.models.request import HTTPRequest
-from app.models.detection import DetectionResult
+from app.models.detection import DetectionFinding, DetectionResult
 
 
 RULES = {
@@ -30,6 +30,13 @@ RULES = {
     ],
 }
 
+SEVERITY_RANK = {
+    "low": 1,
+    "medium": 2,
+    "high": 3,
+    "critical": 4,
+}
+
 
 def build_detection_target(request: HTTPRequest) -> str:
     header_values = [
@@ -49,22 +56,39 @@ def build_detection_target(request: HTTPRequest) -> str:
 
 def inspect_request(request: HTTPRequest) -> DetectionResult:
     target = build_detection_target(request)
+    findings = []
 
     for category, rules in RULES.items():
         for pattern, severity in rules:
             if re.search(pattern, target, re.IGNORECASE):
-                return DetectionResult(
-                    detected=True,
-                    category=category,
-                    rule=pattern,
-                    severity=severity,
-                    action="BLOCK",
-                    reason=f"Matched {category} detection rule",
+                findings.append(
+                    DetectionFinding(
+                        category=category,
+                        rule=pattern,
+                        severity=severity,
+                    )
                 )
 
+    if not findings:
+        return DetectionResult(
+            detected=False,
+            severity="low",
+            action="ALLOW",
+            reason="No configured detection rule matched",
+        )
+
+    primary = findings[0]
+    highest_severity = max(
+        findings,
+        key=lambda finding: SEVERITY_RANK[finding.severity],
+    ).severity
+
     return DetectionResult(
-        detected=False,
-        severity="low",
-        action="ALLOW",
-        reason="No configured detection rule matched",
+        detected=True,
+        category=primary.category,
+        rule=primary.rule,
+        severity=highest_severity,
+        action="BLOCK",
+        reason=f"Matched {len(findings)} detection rule(s)",
+        findings=findings,
     )

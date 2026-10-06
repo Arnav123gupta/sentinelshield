@@ -1,5 +1,12 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Optional
+
+
+@dataclass
+class DetectionFinding:
+    category: str
+    rule: str
+    severity: str
 
 
 @dataclass
@@ -10,3 +17,4 @@ class DetectionResult:
     severity: str = "low"
     action: str = "ALLOW"
     reason: Optional[str] = None
+    findings: list[DetectionFinding] = field(default_factory=list)
