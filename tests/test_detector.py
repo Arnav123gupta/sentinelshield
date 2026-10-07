@@ -220,3 +220,29 @@ def test_safe_request_has_no_findings():
 
     assert result.action == "ALLOW"
     assert result.findings == []
+
+
+def test_url_encoded_sql_injection_is_blocked():
+    request = HTTPRequest(
+        method="GET",
+        path="/login",
+        query_params={"id": "1%20OR%201%3D1"},
+    )
+
+    result = inspect_request(request)
+
+    assert result.action == "BLOCK"
+    assert result.category == "SQL_INJECTION"
+
+
+def test_double_encoded_input_is_not_over_decoded():
+    request = HTTPRequest(
+        method="GET",
+        path="/login",
+        query_params={"id": "1%2520OR%25201%253D1"},
+    )
+
+    result = inspect_request(request)
+
+    assert result.action == "ALLOW"
+    assert result.detected is False

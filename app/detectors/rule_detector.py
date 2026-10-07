@@ -1,4 +1,5 @@
 import re
+from urllib.parse import unquote_plus
 
 from app.models.request import HTTPRequest
 from app.models.detection import DetectionFinding, DetectionResult
@@ -30,12 +31,17 @@ RULES = {
     ],
 }
 
+
 SEVERITY_RANK = {
     "low": 1,
     "medium": 2,
     "high": 3,
     "critical": 4,
 }
+
+
+def normalize_detection_input(value: str) -> str:
+    return unquote_plus(value)
 
 
 def build_detection_target(request: HTTPRequest) -> str:
@@ -45,10 +51,16 @@ def build_detection_target(request: HTTPRequest) -> str:
     ]
 
     parts = [
-        request.path,
-        *request.query_params.values(),
-        *header_values,
-        request.body or "",
+        normalize_detection_input(request.path),
+        *[
+            normalize_detection_input(value)
+            for value in request.query_params.values()
+        ],
+        *[
+            normalize_detection_input(value)
+            for value in header_values
+        ],
+        normalize_detection_input(request.body or ""),
     ]
 
     return " ".join(parts)
