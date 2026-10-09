@@ -44,42 +44,50 @@ def normalize_detection_input(value: str) -> str:
     return unquote_plus(value)
 
 
-def build_detection_target(request: HTTPRequest) -> str:
-    header_values = [
-        f"{key}: {value}"
+def get_detection_sources(request: HTTPRequest) -> list[tuple[str, str]]:
+    sources = [
+        ("path", normalize_detection_input(request.path))
+    ]
+
+    sources.extend(
+        ("query", normalize_detection_input(value))
+        for value in request.query_params.values()
+    )
+
+    sources.extend(
+        ("header", normalize_detection_input(f"{key}: {value}"))
         for key, value in request.headers.items()
-    ]
+    )
 
-    parts = [
-        normalize_detection_input(request.path),
-        *[
-            normalize_detection_input(value)
-            for value in request.query_params.values()
-        ],
-        *[
-            normalize_detection_input(value)
-            for value in header_values
-        ],
-        normalize_detection_input(request.body or ""),
-    ]
+    if request.body:
+        sources.append(
+            ("body", normalize_detection_input(request.body))
+        )
 
-    return " ".join(parts)
+    return sources
+
+
+def build_detection_target(request: HTTPRequest) -> str:
+    return " ".join(
+        value for _, value in get_detection_sources(request)
+    )
 
 
 def inspect_request(request: HTTPRequest) -> DetectionResult:
-    target = build_detection_target(request)
     findings = []
 
-    for category, rules in RULES.items():
-        for pattern, severity in rules:
-            if re.search(pattern, target, re.IGNORECASE):
-                findings.append(
-                    DetectionFinding(
-                        category=category,
-                        rule=pattern,
-                        severity=severity,
+    for location, target in get_detection_sources(request):
+        for category, rules in RULES.items():
+            for pattern, severity in rules:
+                if re.search(pattern, target, re.IGNORECASE):
+                    findings.append(
+                        DetectionFinding(
+                            category=category,
+                            rule=pattern,
+                            severity=severity,
+                            location=location,
+                        )
                     )
-                )
 
     if not findings:
         return DetectionResult(

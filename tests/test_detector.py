@@ -246,3 +246,70 @@ def test_double_encoded_input_is_not_over_decoded():
 
     assert result.action == "ALLOW"
     assert result.detected is False
+
+
+def test_sql_injection_finding_tracks_query_location():
+    request = HTTPRequest(
+        method="GET",
+        path="/login",
+        query_params={"id": "1 OR 1=1"},
+    )
+
+    result = inspect_request(request)
+
+    assert result.action == "BLOCK"
+    assert any(
+        finding.category == "SQL_INJECTION"
+        and finding.location == "query"
+        for finding in result.findings
+    )
+
+
+def test_xss_finding_tracks_header_location():
+    request = HTTPRequest(
+        method="GET",
+        path="/profile",
+        headers={"User-Agent": "<script>alert(1)</script>"},
+    )
+
+    result = inspect_request(request)
+
+    assert result.action == "BLOCK"
+    assert any(
+        finding.category == "XSS"
+        and finding.location == "header"
+        for finding in result.findings
+    )
+
+
+def test_path_traversal_finding_tracks_path_location():
+    request = HTTPRequest(
+        method="GET",
+        path="/files/../../etc/passwd",
+    )
+
+    result = inspect_request(request)
+
+    assert result.action == "BLOCK"
+    assert any(
+        finding.category == "PATH_TRAVERSAL"
+        and finding.location == "path"
+        for finding in result.findings
+    )
+
+
+def test_xss_finding_tracks_body_location():
+    request = HTTPRequest(
+        method="POST",
+        path="/comments",
+        body="<script>alert(1)</script>",
+    )
+
+    result = inspect_request(request)
+
+    assert result.action == "BLOCK"
+    assert any(
+        finding.category == "XSS"
+        and finding.location == "body"
+        for finding in result.findings
+    )

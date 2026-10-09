@@ -1,3 +1,4 @@
+
 from dataclasses import dataclass, field
 from typing import Optional
 
@@ -7,6 +8,7 @@ class DetectionFinding:
     category: str
     rule: str
     severity: str
+    location: str = "unknown"
 
 
 @dataclass
