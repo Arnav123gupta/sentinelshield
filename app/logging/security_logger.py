@@ -26,6 +26,15 @@ def log_detection(
         "severity": result.severity,
         "rule": result.rule,
         "reason": result.reason,
+        "findings": [
+            {
+                "category": finding.category,
+                "rule": finding.rule,
+                "severity": finding.severity,
+                "location": finding.location,
+            }
+            for finding in result.findings
+        ],
     }
 
     with LOG_FILE.open("a", encoding="utf-8") as file:
