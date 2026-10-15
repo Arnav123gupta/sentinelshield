@@ -1,4 +1,5 @@
 from app.models.request import HTTPRequest
+from app.models.detection import DetectionResult
 from app.core.protection_manager import ProtectionManager
 from app.detectors.rule_detector import inspect_request
 from app.logging.security_logger import log_detection
@@ -23,6 +24,14 @@ class RequestProtection:
         )
 
         if decision == "BLOCK":
-            log_detection(request, detection_result)
+            protection_result = DetectionResult(
+                detected=True,
+                category="PROTECTION",
+                rule="RATE_LIMIT_OR_REPEAT_REQUEST",
+                severity="high",
+                action="BLOCK",
+                reason="Blocked by rate limiting or repeated-request protection",
+            )
+            log_detection(request, protection_result)
 
         return decision

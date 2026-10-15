@@ -83,3 +83,19 @@ def test_dashboard_renders_finding_location(monkeypatch):
 
     assert "SQL_INJECTION (query)" in html
 
+def test_dashboard_contains_security_event_filters():
+    html = generate_dashboard()
+
+    assert 'id="actionFilter"' in html
+    assert 'id="categoryFilter"' in html
+    assert 'id="severityFilter"' in html
+    assert 'id="searchFilter"' in html
+    assert 'id="resetFilters"' in html
+
+
+def test_dashboard_contains_filter_logic():
+    html = generate_dashboard()
+
+    assert "No matching security events." in html
+    assert "Showing " in html
+    assert "addEventListener" in html

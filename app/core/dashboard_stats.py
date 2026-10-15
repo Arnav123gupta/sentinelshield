@@ -37,10 +37,14 @@ def get_dashboard_stats() -> dict:
 
 
 def get_recent_events(limit: int = 5) -> list[dict]:
+    if limit <= 0:
+        return []
     events = read_log(SECURITY_LOG)
     return events[-limit:]
 
 
 def get_recent_alerts(limit: int = 5) -> list[dict]:
+    if limit <= 0:
+        return []
     alerts = read_log(ALERT_LOG)
     return alerts[-limit:]
