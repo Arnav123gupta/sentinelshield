@@ -7,11 +7,18 @@ def get_dashboard_stats() -> dict:
     alerts = read_log(ALERT_LOG)
 
     total_requests = len(events)
+
     blocked_requests = sum(
         1 for event in events if event.get("action") == "BLOCK"
     )
+
     allowed_requests = sum(
         1 for event in events if event.get("action") == "ALLOW"
+    )
+
+    unknown_action_requests = sum(
+        1 for event in events
+        if event.get("action") not in ("BLOCK", "ALLOW")
     )
 
     attack_categories = Counter(
@@ -30,6 +37,7 @@ def get_dashboard_stats() -> dict:
         "total_requests": total_requests,
         "blocked_requests": blocked_requests,
         "allowed_requests": allowed_requests,
+        "unknown_action_requests": unknown_action_requests,
         "attack_categories": dict(attack_categories),
         "severity_counts": dict(severity_counts),
         "total_alerts": len(alerts),

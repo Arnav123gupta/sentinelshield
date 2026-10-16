@@ -4,80 +4,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SentinelShield Dashboard</title>
+    <title>SentinelShield Security Dashboard</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 24px;
             background: #f4f6f8;
+            color: #202833;
         }
-
-        h1 {
-            margin-bottom: 24px;
-        }
-
+        h1 { margin-bottom: 24px; }
         .cards {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(4, minmax(0, 1fr));
             gap: 16px;
         }
-
         .card {
             background: white;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
-
         .number {
             font-size: 28px;
             font-weight: bold;
+            margin-top: 8px;
         }
-
         section {
             margin-top: 24px;
             background: white;
             padding: 20px;
             border-radius: 10px;
+            overflow-x: auto;
         }
-
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .filters label {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        select, input, button {
+            padding: 9px;
+            border: 1px solid #cbd2d9;
+            border-radius: 6px;
+            background: white;
+            color: #202833;
+        }
+        button {
+            cursor: pointer;
+            align-self: end;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
         }
-
         th, td {
             padding: 10px;
             border-bottom: 1px solid #ddd;
             text-align: left;
         }
-
-        th {
-            background: #f0f2f4;
+        th { background: #f0f2f4; }
+        .empty {
+            text-align: center;
+            padding: 20px;
+            color: #657080;
+        }
+        @media (max-width: 760px) {
+            body { padding: 12px; }
+            .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         }
     </style>
 </head>
-
 <body>
-    <h1>🛡️ SentinelShield Security Dashboard</h1>
+    <h1>🛡 SentinelShield Security Dashboard</h1>
 
     <div class="cards">
         <div class="card">
             <div>Total Requests</div>
-            <div class="number">5</div>
+            <div class="number">29</div>
         </div>
-
         <div class="card">
             <div>Blocked Requests</div>
-            <div class="number">1</div>
+            <div class="number">25</div>
         </div>
-
         <div class="card">
             <div>Allowed Requests</div>
             <div class="number">1</div>
         </div>
-
+        <div class="card">
+            <div>Unknown Actions</div>
+            <div class="number">3</div>
+        </div>
         <div class="card">
             <div>Security Alerts</div>
             <div class="number">1</div>
@@ -87,37 +111,64 @@
     <section>
         <h2>Attack Categories</h2>
         <table>
-            <tr>
-                <th>Category</th>
-                <th>Count</th>
-            </tr>
-            <tr><td>SQL_INJECTION</td><td>4</td></tr>
+            <tr><th>Category</th><th>Count</th></tr>
+            <tr><td>SQL_INJECTION</td><td>16</td></tr><tr><td>XSS</td><td>12</td></tr>
         </table>
     </section>
 
     <section>
         <h2>Severity Breakdown</h2>
         <table>
-            <tr>
-                <th>Severity</th>
-                <th>Count</th>
-            </tr>
-            <tr><td>HIGH</td><td>4</td></tr>
+            <tr><th>Severity</th><th>Count</th></tr>
+            <tr><td>HIGH</td><td>28</td></tr>
         </table>
     </section>
 
     <section>
         <h2>Recent Security Events</h2>
+        <div class="filters">
+            <label>Action
+                <select id="actionFilter">
+                    <option value="">All actions</option>
+                    <option value="BLOCK">BLOCK</option>
+                    <option value="ALLOW">ALLOW</option>
+                </select>
+            </label>
+            <label>Category
+                <select id="categoryFilter">
+                    <option value="">All categories</option>
+                </select>
+            </label>
+            <label>Severity
+                <select id="severityFilter">
+                    <option value="">All severities</option>
+                    <option value="critical">Critical</option>
+                    <option value="high">High</option>
+                    <option value="medium">Medium</option>
+                    <option value="low">Low</option>
+                    <option value="unknown">Unknown</option>
+                </select>
+            </label>
+            <label>Search path or IP
+                <input id="searchFilter" type="search" placeholder="/login or IP">
+            </label>
+            <button id="resetFilters" type="button">Reset filters</button>
+        </div>
+        <p id="filterCount" aria-live="polite"></p>
         <table>
-            <tr>
-                <th>Timestamp</th>
-                <th>IP</th>
-                <th>Path</th>
-                <th>Category</th>
-                <th>Severity</th>
-                <th>Action</th>
-            </tr>
-            
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>IP</th>
+                    <th>Path</th>
+                    <th>Category</th>
+                    <th>Severity</th>
+                    <th>Action</th>
+                    <th>Findings / Location</th>
+                </tr>
+            </thead>
+            <tbody id="eventTableBody">
+
         <tr>
             <td>2026-09-21T07:43:09.828498+00:00</td>
             <td>127.0.0.1</td>
@@ -125,8 +176,9 @@
             <td>SQL_INJECTION</td>
             <td>high</td>
             <td>UNKNOWN</td>
+            <td>-</td>
         </tr>
-        
+
         <tr>
             <td>2026-09-21T07:53:43.627628+00:00</td>
             <td>127.0.0.1</td>
@@ -134,8 +186,9 @@
             <td>SQL_INJECTION</td>
             <td>high</td>
             <td>UNKNOWN</td>
+            <td>-</td>
         </tr>
-        
+
         <tr>
             <td>2026-09-21T08:04:05.036342+00:00</td>
             <td>127.0.0.1</td>
@@ -143,8 +196,9 @@
             <td>SQL_INJECTION</td>
             <td>high</td>
             <td>UNKNOWN</td>
+            <td>-</td>
         </tr>
-        
+
         <tr>
             <td>2026-09-24T08:16:25.899598+00:00</td>
             <td>127.0.0.1</td>
@@ -152,8 +206,9 @@
             <td>NORMAL</td>
             <td>low</td>
             <td>ALLOW</td>
+            <td>-</td>
         </tr>
-        
+
         <tr>
             <td>2026-09-24T08:16:25.909460+00:00</td>
             <td>127.0.0.1</td>
@@ -161,8 +216,250 @@
             <td>SQL_INJECTION</td>
             <td>high</td>
             <td>BLOCK</td>
+            <td>-</td>
         </tr>
-        
+
+        <tr>
+            <td>2026-10-15T07:25:48.857213+00:00</td>
+            <td>127.0.0.1</td>
+            <td>/integration-login</td>
+            <td>SQL_INJECTION</td>
+            <td>high</td>
+            <td>BLOCK</td>
+            <td>SQL_INJECTION (query)</td>
+        </tr>
+
+        <tr>
+            <td>2026-10-15T07:25:48.860086+00:00</td>
+            <td>127.0.0.1</td>
+            <td>/integration-search</td>
+            <td>XSS</td>
+            <td>high</td>
+            <td>BLOCK</td>
+            <td>XSS (query)</td>
+        </tr>
+
+        <tr>
+            <td>2026-10-15T07:26:09.766271+00:00</td>
+            <td>127.0.0.1</td>
+            <td>/integration-login</td>
+            <td>SQL_INJECTION</td>
+            <td>high</td>
+            <td>BLOCK</td>
+            <td>SQL_INJECTION (query)</td>
+        </tr>
+
+        <tr>
+            <td>2026-10-15T07:26:09.775007+00:00</td>
+            <td>127.0.0.1</td>
+            <td>/integration-search</td>
+            <td>XSS</td>
+            <td>high</td>
+            <td>BLOCK</td>
+            <td>XSS (query)</td>
+        </tr>
+
+        <tr>
+            <td>2026-10-15T07:26:35.871865+00:00</td>
+            <td>127.0.0.1</td>
+            <td>/integration-login</td>
+            <td>SQL_INJECTION</td>
+            <td>high</td>
+            <td>BLOCK</td>
+            <td>SQL_INJECTION (query)</td>
+        </tr>
+
+        <tr>
+            <td>2026-10-15T07:26:35.875409+00:00</td>
+            <td>127.0.0.1</td>
+            <td>/integration-search</td>
+            <td>XSS</td>
+            <td>high</td>
+            <td>BLOCK</td>
+            <td>XSS (query)</td>
+        </tr>
+
+        <tr>
+            <td>2026-10-15T07:32:40.180203+00:00</td>
+            <td>127.0.0.1</td>
+            <td>/integration-login</td>
+            <td>SQL_INJECTION</td>
+            <td>high</td>
+            <td>BLOCK</td>
+            <td>SQL_INJECTION (query)</td>
+        </tr>
+
+        <tr>
+            <td>2026-10-15T07:32:40.183976+00:00</td>
+            <td>127.0.0.1</td>
+            <td>/integration-search</td>
+            <td>XSS</td>
+            <td>high</td>
+            <td>BLOCK</td>
+            <td>XSS (query)</td>
+        </tr>
+
+        <tr>
+            <td>2026-10-15T07:49:25.908856+00:00</td>
+            <td>127.0.0.1</td>
+            <td>/integration-login</td>
+            <td>SQL_INJECTION</td>
+            <td>high</td>
+            <td>BLOCK</td>
+            <td>SQL_INJECTION (query)</td>
+        </tr>
+
+        <tr>
+            <td>2026-10-15T07:49:25.912274+00:00</td>
+            <td>127.0.0.1</td>
+            <td>/integration-search</td>
+            <td>XSS</td>
+            <td>high</td>
+            <td>BLOCK</td>
+            <td>XSS (query)</td>
+        </tr>
+
+        <tr>
+            <td>2026-10-15T07:50:02.919049+00:00</td>
+            <td>127.0.0.1</td>
+            <td>/integration-login</td>
+            <td>SQL_INJECTION</td>
+            <td>high</td>
+            <td>BLOCK</td>
+            <td>SQL_INJECTION (query)</td>
+        </tr>
+
+        <tr>
+            <td>2026-10-15T07:50:02.923592+00:00</td>
+            <td>127.0.0.1</td>
+            <td>/integration-search</td>
+            <td>XSS</td>
+            <td>high</td>
+            <td>BLOCK</td>
+            <td>XSS (query)</td>
+        </tr>
+
+        <tr>
+            <td>2026-10-15T07:53:32.732085+00:00</td>
+            <td>127.0.0.1</td>
+            <td>/integration-login</td>
+            <td>SQL_INJECTION</td>
+            <td>high</td>
+            <td>BLOCK</td>
+            <td>SQL_INJECTION (query)</td>
+        </tr>
+
+        <tr>
+            <td>2026-10-15T07:53:32.735380+00:00</td>
+            <td>127.0.0.1</td>
+            <td>/integration-search</td>
+            <td>XSS</td>
+            <td>high</td>
+            <td>BLOCK</td>
+            <td>XSS (query)</td>
+        </tr>
+
+        <tr>
+            <td>2026-10-15T07:59:26.596106+00:00</td>
+            <td>127.0.0.1</td>
+            <td>/integration-login</td>
+            <td>SQL_INJECTION</td>
+            <td>high</td>
+            <td>BLOCK</td>
+            <td>SQL_INJECTION (query)</td>
+        </tr>
+
+        <tr>
+            <td>2026-10-15T07:59:26.599498+00:00</td>
+            <td>127.0.0.1</td>
+            <td>/integration-search</td>
+            <td>XSS</td>
+            <td>high</td>
+            <td>BLOCK</td>
+            <td>XSS (query)</td>
+        </tr>
+
+        <tr>
+            <td>2026-10-15T08:00:21.424657+00:00</td>
+            <td>127.0.0.1</td>
+            <td>/integration-login</td>
+            <td>SQL_INJECTION</td>
+            <td>high</td>
+            <td>BLOCK</td>
+            <td>SQL_INJECTION (query)</td>
+        </tr>
+
+        <tr>
+            <td>2026-10-15T08:00:21.439213+00:00</td>
+            <td>127.0.0.1</td>
+            <td>/integration-search</td>
+            <td>XSS</td>
+            <td>high</td>
+            <td>BLOCK</td>
+            <td>XSS (query)</td>
+        </tr>
+
+        <tr>
+            <td>2026-10-15T08:43:18.561644+00:00</td>
+            <td>127.0.0.1</td>
+            <td>/integration-login</td>
+            <td>SQL_INJECTION</td>
+            <td>high</td>
+            <td>BLOCK</td>
+            <td>SQL_INJECTION (query)</td>
+        </tr>
+
+        <tr>
+            <td>2026-10-15T08:43:18.563991+00:00</td>
+            <td>127.0.0.1</td>
+            <td>/integration-search</td>
+            <td>XSS</td>
+            <td>high</td>
+            <td>BLOCK</td>
+            <td>XSS (query)</td>
+        </tr>
+
+        <tr>
+            <td>2026-10-16T06:37:12.358606+00:00</td>
+            <td>127.0.0.1</td>
+            <td>/integration-login</td>
+            <td>SQL_INJECTION</td>
+            <td>high</td>
+            <td>BLOCK</td>
+            <td>SQL_INJECTION (query)</td>
+        </tr>
+
+        <tr>
+            <td>2026-10-16T06:37:12.362671+00:00</td>
+            <td>127.0.0.1</td>
+            <td>/integration-search</td>
+            <td>XSS</td>
+            <td>high</td>
+            <td>BLOCK</td>
+            <td>XSS (query)</td>
+        </tr>
+
+        <tr>
+            <td>2026-10-16T06:41:18.585969+00:00</td>
+            <td>127.0.0.1</td>
+            <td>/integration-login</td>
+            <td>SQL_INJECTION</td>
+            <td>high</td>
+            <td>BLOCK</td>
+            <td>SQL_INJECTION (query)</td>
+        </tr>
+
+        <tr>
+            <td>2026-10-16T06:41:18.589085+00:00</td>
+            <td>127.0.0.1</td>
+            <td>/integration-search</td>
+            <td>XSS</td>
+            <td>high</td>
+            <td>BLOCK</td>
+            <td>XSS (query)</td>
+        </tr>
+
+            </tbody>
         </table>
     </section>
 
@@ -175,15 +472,100 @@
                 <th>Severity</th>
                 <th>Action</th>
             </tr>
-            
+
         <tr>
             <td>2026-09-24T10:54:37.479303+00:00</td>
             <td>XSS</td>
             <td>high</td>
             <td>BLOCK</td>
         </tr>
-        
+
         </table>
     </section>
+
+    <script id="eventData" type="application/json">[{"timestamp": "2026-09-21T07:43:09.828498+00:00", "client_ip": "127.0.0.1", "path": "/search", "category": "SQL_INJECTION", "severity": "high", "action": "UNKNOWN", "findings": "-"}, {"timestamp": "2026-09-21T07:53:43.627628+00:00", "client_ip": "127.0.0.1", "path": "/search", "category": "SQL_INJECTION", "severity": "high", "action": "UNKNOWN", "findings": "-"}, {"timestamp": "2026-09-21T08:04:05.036342+00:00", "client_ip": "127.0.0.1", "path": "/search", "category": "SQL_INJECTION", "severity": "high", "action": "UNKNOWN", "findings": "-"}, {"timestamp": "2026-09-24T08:16:25.899598+00:00", "client_ip": "127.0.0.1", "path": "/home", "category": "NORMAL", "severity": "low", "action": "ALLOW", "findings": "-"}, {"timestamp": "2026-09-24T08:16:25.909460+00:00", "client_ip": "127.0.0.1", "path": "/login", "category": "SQL_INJECTION", "severity": "high", "action": "BLOCK", "findings": "-"}, {"timestamp": "2026-10-15T07:25:48.857213+00:00", "client_ip": "127.0.0.1", "path": "/integration-login", "category": "SQL_INJECTION", "severity": "high", "action": "BLOCK", "findings": "SQL_INJECTION (query)"}, {"timestamp": "2026-10-15T07:25:48.860086+00:00", "client_ip": "127.0.0.1", "path": "/integration-search", "category": "XSS", "severity": "high", "action": "BLOCK", "findings": "XSS (query)"}, {"timestamp": "2026-10-15T07:26:09.766271+00:00", "client_ip": "127.0.0.1", "path": "/integration-login", "category": "SQL_INJECTION", "severity": "high", "action": "BLOCK", "findings": "SQL_INJECTION (query)"}, {"timestamp": "2026-10-15T07:26:09.775007+00:00", "client_ip": "127.0.0.1", "path": "/integration-search", "category": "XSS", "severity": "high", "action": "BLOCK", "findings": "XSS (query)"}, {"timestamp": "2026-10-15T07:26:35.871865+00:00", "client_ip": "127.0.0.1", "path": "/integration-login", "category": "SQL_INJECTION", "severity": "high", "action": "BLOCK", "findings": "SQL_INJECTION (query)"}, {"timestamp": "2026-10-15T07:26:35.875409+00:00", "client_ip": "127.0.0.1", "path": "/integration-search", "category": "XSS", "severity": "high", "action": "BLOCK", "findings": "XSS (query)"}, {"timestamp": "2026-10-15T07:32:40.180203+00:00", "client_ip": "127.0.0.1", "path": "/integration-login", "category": "SQL_INJECTION", "severity": "high", "action": "BLOCK", "findings": "SQL_INJECTION (query)"}, {"timestamp": "2026-10-15T07:32:40.183976+00:00", "client_ip": "127.0.0.1", "path": "/integration-search", "category": "XSS", "severity": "high", "action": "BLOCK", "findings": "XSS (query)"}, {"timestamp": "2026-10-15T07:49:25.908856+00:00", "client_ip": "127.0.0.1", "path": "/integration-login", "category": "SQL_INJECTION", "severity": "high", "action": "BLOCK", "findings": "SQL_INJECTION (query)"}, {"timestamp": "2026-10-15T07:49:25.912274+00:00", "client_ip": "127.0.0.1", "path": "/integration-search", "category": "XSS", "severity": "high", "action": "BLOCK", "findings": "XSS (query)"}, {"timestamp": "2026-10-15T07:50:02.919049+00:00", "client_ip": "127.0.0.1", "path": "/integration-login", "category": "SQL_INJECTION", "severity": "high", "action": "BLOCK", "findings": "SQL_INJECTION (query)"}, {"timestamp": "2026-10-15T07:50:02.923592+00:00", "client_ip": "127.0.0.1", "path": "/integration-search", "category": "XSS", "severity": "high", "action": "BLOCK", "findings": "XSS (query)"}, {"timestamp": "2026-10-15T07:53:32.732085+00:00", "client_ip": "127.0.0.1", "path": "/integration-login", "category": "SQL_INJECTION", "severity": "high", "action": "BLOCK", "findings": "SQL_INJECTION (query)"}, {"timestamp": "2026-10-15T07:53:32.735380+00:00", "client_ip": "127.0.0.1", "path": "/integration-search", "category": "XSS", "severity": "high", "action": "BLOCK", "findings": "XSS (query)"}, {"timestamp": "2026-10-15T07:59:26.596106+00:00", "client_ip": "127.0.0.1", "path": "/integration-login", "category": "SQL_INJECTION", "severity": "high", "action": "BLOCK", "findings": "SQL_INJECTION (query)"}, {"timestamp": "2026-10-15T07:59:26.599498+00:00", "client_ip": "127.0.0.1", "path": "/integration-search", "category": "XSS", "severity": "high", "action": "BLOCK", "findings": "XSS (query)"}, {"timestamp": "2026-10-15T08:00:21.424657+00:00", "client_ip": "127.0.0.1", "path": "/integration-login", "category": "SQL_INJECTION", "severity": "high", "action": "BLOCK", "findings": "SQL_INJECTION (query)"}, {"timestamp": "2026-10-15T08:00:21.439213+00:00", "client_ip": "127.0.0.1", "path": "/integration-search", "category": "XSS", "severity": "high", "action": "BLOCK", "findings": "XSS (query)"}, {"timestamp": "2026-10-15T08:43:18.561644+00:00", "client_ip": "127.0.0.1", "path": "/integration-login", "category": "SQL_INJECTION", "severity": "high", "action": "BLOCK", "findings": "SQL_INJECTION (query)"}, {"timestamp": "2026-10-15T08:43:18.563991+00:00", "client_ip": "127.0.0.1", "path": "/integration-search", "category": "XSS", "severity": "high", "action": "BLOCK", "findings": "XSS (query)"}, {"timestamp": "2026-10-16T06:37:12.358606+00:00", "client_ip": "127.0.0.1", "path": "/integration-login", "category": "SQL_INJECTION", "severity": "high", "action": "BLOCK", "findings": "SQL_INJECTION (query)"}, {"timestamp": "2026-10-16T06:37:12.362671+00:00", "client_ip": "127.0.0.1", "path": "/integration-search", "category": "XSS", "severity": "high", "action": "BLOCK", "findings": "XSS (query)"}, {"timestamp": "2026-10-16T06:41:18.585969+00:00", "client_ip": "127.0.0.1", "path": "/integration-login", "category": "SQL_INJECTION", "severity": "high", "action": "BLOCK", "findings": "SQL_INJECTION (query)"}, {"timestamp": "2026-10-16T06:41:18.589085+00:00", "client_ip": "127.0.0.1", "path": "/integration-search", "category": "XSS", "severity": "high", "action": "BLOCK", "findings": "XSS (query)"}]</script>
+    <script>
+    (() => {
+        const data = JSON.parse(document.getElementById("eventData").textContent);
+        const actionFilter = document.getElementById("actionFilter");
+        const categoryFilter = document.getElementById("categoryFilter");
+        const severityFilter = document.getElementById("severityFilter");
+        const searchFilter = document.getElementById("searchFilter");
+        const tableBody = document.getElementById("eventTableBody");
+        const countLabel = document.getElementById("filterCount");
+
+        const categories = [...new Set(data.map(e => e.category))].sort();
+        categories.forEach(category => {
+            const option = document.createElement("option");
+            option.value = category;
+            option.textContent = category;
+            categoryFilter.appendChild(option);
+        });
+
+        function cell(value) {
+            const td = document.createElement("td");
+            td.textContent = value ?? "-";
+            return td;
+        }
+
+        function render() {
+            const action = actionFilter.value.toUpperCase();
+            const category = categoryFilter.value.toUpperCase();
+            const severity = severityFilter.value.toLowerCase();
+            const search = searchFilter.value.trim().toLowerCase();
+
+            const filtered = data.filter(event =>
+                (!action || event.action.toUpperCase() === action) &&
+                (!category || event.category.toUpperCase() === category) &&
+                (!severity || event.severity.toLowerCase() === severity) &&
+                (!search ||
+                    event.path.toLowerCase().includes(search) ||
+                    event.client_ip.toLowerCase().includes(search))
+            );
+
+            tableBody.replaceChildren();
+
+            if (filtered.length === 0) {
+                const row = document.createElement("tr");
+                const td = cell("No matching security events.");
+                td.colSpan = 7;
+                td.className = "empty";
+                row.appendChild(td);
+                tableBody.appendChild(row);
+            } else {
+                filtered.forEach(event => {
+                    const row = document.createElement("tr");
+                    [
+                        event.timestamp,
+                        event.client_ip,
+                        event.path,
+                        event.category,
+                        event.severity,
+                        event.action,
+                        event.findings
+                    ].forEach(value => row.appendChild(cell(value)));
+                    tableBody.appendChild(row);
+                });
+            }
+
+            countLabel.textContent = `Showing ${filtered.length} of ${data.length} events`;
+        }
+
+        [actionFilter, categoryFilter, severityFilter].forEach(
+            element => element.addEventListener("change", render)
+        );
+        searchFilter.addEventListener("input", render);
+
+        document.getElementById("resetFilters").addEventListener("click", () => {
+            actionFilter.value = "";
+            categoryFilter.value = "";
+            severityFilter.value = "";
+            searchFilter.value = "";
+            render();
+        });
+
+        render();
+    })();
+    </script>
 </body>
 </html>

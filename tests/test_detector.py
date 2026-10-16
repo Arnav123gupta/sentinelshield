@@ -313,3 +313,47 @@ def test_xss_finding_tracks_body_location():
         and finding.location == "body"
         for finding in result.findings
     )
+
+
+def test_safe_sql_learning_query_is_allowed():
+    request = HTTPRequest(
+        method="GET",
+        path="/search",
+        query_params={"q": "Learn SQL injection prevention techniques"},
+    )
+    result = inspect_request(request)
+    assert result.action == "ALLOW"
+    assert result.detected is False
+
+
+def test_safe_html_paragraph_in_body_is_allowed():
+    request = HTTPRequest(
+        method="POST",
+        path="/comment",
+        body="<p>Hello, welcome to my website.</p>",
+    )
+    result = inspect_request(request)
+    assert result.action == "ALLOW"
+    assert result.detected is False
+
+
+def test_url_encoded_xss_is_blocked():
+    request = HTTPRequest(
+        method="GET",
+        path="/search",
+        query_params={"q": "%3Cscript%3Ealert(1)%3C%2Fscript%3E"},
+    )
+    result = inspect_request(request)
+    assert result.action == "BLOCK"
+    assert result.category == "XSS"
+
+
+def test_safe_browser_user_agent_is_allowed():
+    request = HTTPRequest(
+        method="GET",
+        path="/profile",
+        headers={"User-Agent": "Mozilla/5.0 SecurityTestingBrowser"},
+    )
+    result = inspect_request(request)
+    assert result.action == "ALLOW"
+    assert result.detected is False

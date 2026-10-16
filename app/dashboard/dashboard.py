@@ -179,6 +179,10 @@ def generate_dashboard() -> str:
             <div class="number">{stats["allowed_requests"]}</div>
         </div>
         <div class="card">
+            <div>Unknown Actions</div>
+            <div class="number">{stats.get("unknown_action_requests", 0)}</div>
+        </div>
+        <div class="card">
             <div>Security Alerts</div>
             <div class="number">{stats["total_alerts"]}</div>
         </div>
