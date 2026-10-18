@@ -60,4 +60,28 @@ The project test suite reported 72 passed tests. Record the date and final outpu
 - This prototype is for authorized local testing and learning, not a production security guarantee.
 
 ## 9. Final Analysis
-Complete this section after collecting and reviewing the final evidence. Record the test cases performed, expected and actual outcomes, any false positives or false negatives, and practical recommendations. Do not invent results.
+
+### Verification Performed
+- Automated test suite: 72 tests passed in 0.39 seconds during final verification.
+- Safe local home request: HTTP 200; response status was `allowed`.
+- Controlled SQL injection test against the local application: HTTP 403; response status was `blocked`.
+- Dashboard HTML was regenerated using the current security logs.
+- `git diff --check` completed without whitespace errors after dashboard cleanup.
+
+### Evidence Records
+Text outputs were saved under `reports/`, including:
+- `pytest-results.txt`
+- `local-verification.txt`
+- `safe-response.json`
+- `blocked-response.json`
+- `app-runtime.log`
+
+### Interpretation
+The observed requests behaved as expected in these controlled checks, and the automated suite passed. These results support the prototype's intended behavior for the tested cases; they do not establish comprehensive real-world detection accuracy.
+
+### Limitations and Recommendations
+- Only the recorded test cases and automated suite outcomes are claimed here.
+- False-positive and false-negative rates have not been measured using a comprehensive labelled dataset.
+- The rule-based detector may miss variants outside its configured patterns.
+- Capture and review the requested screenshots before final submission.
+- Keep testing restricted to systems that are owned by the tester or explicitly authorized.

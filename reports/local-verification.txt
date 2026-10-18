@@ -1,0 +1,6 @@
+SentinelShield Local Verification
+2026-10-18T02:23:21-04:00
+Safe request HTTP status: 200
+Controlled detection test HTTP status: 403
+
+Expected: safe request 200; controlled detection test 403.

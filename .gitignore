@@ -20,3 +20,7 @@ logs/
 # Temporary files
 *.tmp
 *.swp
+
+# Local verification artifacts
+*.bak-*
+reports/app.pid
