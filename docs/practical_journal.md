@@ -43,7 +43,8 @@ A manual detector test set contained nine cases:
 Result: 9 of 9 expected outcomes matched in this initial test set. This is not a general detection-accuracy percentage.
 
 ## 6. Automated Test Results
-The project test suite reported 72 passed tests. Record the date and final output when collecting submission evidence.
+- Saved test evidence: 72 tests passed in 0.39 seconds.
+- Latest verification run: 72 tests passed in 0.56 seconds.
 
 ## 7. Evidence to Collect
 - Screenshot of the project running locally
@@ -60,9 +61,8 @@ The project test suite reported 72 passed tests. Record the date and final outpu
 - This prototype is for authorized local testing and learning, not a production security guarantee.
 
 ## 9. Final Analysis
-
 ### Verification Performed
-- Automated test suite: 72 tests passed in 0.39 seconds during final verification.
+- Automated test suite: 72 tests passed in the saved verification record (0.39 seconds); the latest run also passed all 72 tests (0.56 seconds).
 - Safe local home request: HTTP 200; response status was `allowed`.
 - Controlled SQL injection test against the local application: HTTP 403; response status was `blocked`.
 - Dashboard HTML was regenerated using the current security logs.
