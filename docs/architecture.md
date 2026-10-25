@@ -1,36 +1,35 @@
 # SentinelShield Architecture
 
+## Request Protection Flow
+
 ```mermaid
 flowchart TD
-    A[Incoming HTTP Request] --> B[Request Parsing]
-    B --> C[Input Normalization]
-    C --> D[Rule-Based Detection Engine]
-    D --> E{Detection Result}
-    E -->|No rule matched| F[ALLOW]
-    E -->|Rule matched| G[BLOCK]
+    A[Incoming HTTP Request] --> B[Flask Request Parsing]
+    B --> C[Build HTTPRequest Model]
+    C --> D[Rule-Based Detection]
+    D --> E{Suspicious Pattern Detected?}
 
-    B --> H[Traffic Tracking]
-    H --> I[Rate Limiter and Repeat Detector]
-    I --> J{Traffic Decision}
-    J -->|Within limits| K[Continue Protection Flow]
-    J -->|Limit exceeded| L[Protection BLOCK]
+    E -->|Yes| F[Log Detection]
+    F --> G[BLOCK: HTTP 403]
 
-    F --> M[Security Event Logs]
-    G --> M
-    L --> M
-    M --> N[Alerts and Dashboard Statistics]
-    N --> O[Security Dashboard]
+    E -->|No| H[ProtectionManager]
+    H --> I{IP Already Blocked?}
+    I -->|Yes| J[BLOCK]
+    I -->|No| K[Rate Limiter]
 
-```
+    K --> L{Rate Limit Exceeded?}
+    L -->|Yes| M[Block Client IP]
+    L -->|No| N[Repeat Detector]
 
-## Architecture Explanation
+    N --> O{Repeat Threshold Exceeded?}
+    O -->|Yes| M
+    O -->|No| P[ALLOW: HTTP 200]
 
-1. **Request parsing:** Collects HTTP request details.
-2. **Input normalization:** Decodes input before detection.
-3. **Detection engine:** Checks configured rules for SQL injection, XSS, path traversal, LFI and command injection.
-4. **Traffic protection:** Checks rate limits and repeated requests.
-5. **Decision:** Allows or blocks requests according to the protection logic.
-6. **Logging and alerts:** Records security events for analysis.
-7. **Dashboard:** Displays available security statistics.
+    M --> Q[Log Protection Block]
+    Q --> J
 
-*Note: Verify the exact runtime flow against the source code before final submission.*
+    G --> R[Security Event Log]
+    J --> R
+    P --> S[Allowed Response]
+    R --> T[Dashboard Statistics]
+    T --> U[Security Dashboard]

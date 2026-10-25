@@ -44,7 +44,7 @@ Result: 9 of 9 expected outcomes matched in this initial test set. This is not a
 
 ## 6. Automated Test Results
 - Saved test evidence: 72 tests passed in 0.39 seconds.
-- Latest verification run: 72 tests passed in 0.56 seconds.
+- Latest verification run: 72 tests passed in 0.23 seconds.
 
 ## 7. Evidence to Collect
 - Screenshot of the project running locally
@@ -62,7 +62,7 @@ Result: 9 of 9 expected outcomes matched in this initial test set. This is not a
 
 ## 9. Final Analysis
 ### Verification Performed
-- Automated test suite: 72 tests passed in the saved verification record (0.39 seconds); the latest run also passed all 72 tests (0.56 seconds).
+- Automated test suite: 72 tests passed in the saved verification record (0.39 seconds); the latest run also passed all 72 tests (0.23 seconds).
 - Safe local home request: HTTP 200; response status was `allowed`.
 - Controlled SQL injection test against the local application: HTTP 403; response status was `blocked`.
 - Dashboard HTML was regenerated using the current security logs.
