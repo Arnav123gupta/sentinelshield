@@ -1,5 +1,6 @@
 import os
 from flask import Flask, jsonify, request
+from app.dashboard.dashboard import generate_dashboard
 
 from app.core.request_protection import RequestProtection
 from app.models.request import HTTPRequest
@@ -9,7 +10,18 @@ app = Flask(__name__)
 protection = RequestProtection()
 
 
-@app.route("/", defaults={"path": ""}, methods=["GET", "POST", "PUT", "PATCH", "DELETE"])
+@app.route("/", methods=["GET"])
+def dashboard_home():
+    return generate_dashboard(), 200, {
+        "Content-Type": "text/html; charset=utf-8"
+    }
+
+
+@app.route("/", methods=["POST", "PUT", "PATCH", "DELETE"])
+def protected_root_request():
+    return protected_request("")
+
+
 @app.route("/<path:path>", methods=["GET", "POST", "PUT", "PATCH", "DELETE"])
 def protected_request(path: str):
     http_request = HTTPRequest(

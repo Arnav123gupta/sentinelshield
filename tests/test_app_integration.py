@@ -1,16 +1,15 @@
 from app.main import app
 
 
-def test_home_request_returns_allowed_json():
+def test_home_request_returns_dashboard_html():
     client = app.test_client()
 
     response = client.get("/")
 
     assert response.status_code == 200
-    assert response.is_json
-    data = response.get_json()
-    assert data["status"] == "allowed"
-    assert data["path"] == "/"
+    assert response.content_type.startswith("text/html")
+    assert b"SentinelShield Security Dashboard" in response.data
+    assert b"Recent Security Events" in response.data
 
 
 def test_safe_path_returns_allowed_response():
